@@ -1,0 +1,23 @@
+{
+  "name": "raspschedule",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/peterpeerdeman/raspschedule.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/peterpeerdeman/raspschedule/issues"
+  },
+  "homepage": "https://github.com/peterpeerdeman/raspschedule",
+  "dependencies": {
+    "cron": "^1.0.9",
+    "request": "^2.65.0"
+  }
+}
