@@ -1,7 +1,12 @@
 var CronJob = require('cron').CronJob;
 var request = require('request');
+var suncalc = require('suncalc');
 var apiUrl = 'http://localhost:3000/api';
 var recordFairsTokenUrl = '';
+var geolocation = {
+    lat: 52.4996287 
+    lng: 4.9375694
+}
 
 function lightsOn() {
     request(apiUrl + '/lights/on', function(error, response, body) {
@@ -16,14 +21,17 @@ function lightsOff() {
 var lightsOnWeekdaysMorning = new CronJob({
     cronTime: '00 00 07 * * 1-5',
     onTick: function() {
-        lightsOn();
+        var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng)
+        if (times.sunrise > new Date) {
+            lightsOn();
+        }
     },
     start: true,
     timeZone: 'Europe/Amsterdam'
 });
 
 var lightsOffWeekdaysMorning = new CronJob({
-    cronTime: '00 30 08 * * 1-5',
+    cronTime: '00 20 08 * * 1-5',
     onTick: function() {
         lightsOff();
     },
@@ -31,17 +39,37 @@ var lightsOffWeekdaysMorning = new CronJob({
     timeZone: 'Europe/Amsterdam'
 });
 
-var lightsOnWeekdaysEvening = new CronJob({
-    cronTime: '00 30 16 * * 1-5',
+var lightsOnEvening = new CronJob({
+    cronTime: '00 00 00 * * *',
     onTick: function() {
-        lightsOn();
+        var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng)
+        new CronJob(
+            times.sunset, 
+            function() {
+                lightsOn();
+            },
+            function() {
+                /* This function is executed when the job stops */
+            },
+            true,
+            'Europe/Amsterdam'
+        );
     },
     start: true,
     timeZone: 'Europe/Amsterdam'
 });
 
 var lightsOffWeekdaysEvening = new CronJob({
-    cronTime: '00 00 22 * * 1-5',
+    cronTime: '00 00 22 * * 1-5,7',
+    onTick: function() {
+        lightsOff();
+    },
+    start: true,
+    timeZone: 'Europe/Amsterdam'
+});
+
+var lightsOffWeekendEvening = new CronJob({
+    cronTime: '00 00 01 * * 6,7',
     onTick: function() {
         lightsOff();
     },
