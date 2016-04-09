@@ -1,6 +1,8 @@
 var CronJob = require('cron').CronJob;
 var request = require('request');
 var suncalc = require('suncalc');
+var moment = require('moment');
+
 var apiUrl = 'http://localhost:3000/api';
 var recordFairsTokenUrl = '';
 var geolocation = {
@@ -41,19 +43,19 @@ var lightsOffWeekdaysMorning = new CronJob({
 });
 
 var lightsOnEvening = new CronJob({
-    cronTime: '00 01 00 * * *',
+    cronTime: '00 00 04 * * *',
     onTick: function() {
         var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng)
-        console.log("scheduling for: " + times.sunset)
+        console.log("sunset: " + times.sunset)
+        console.log("scheduling for: " + moment(times.sunset).subtract(30, 'minutes').toDate())
         new CronJob(
-            times.sunset, 
+            moment(times.sunset).subtract(30, 'minutes').toDate(), 
             function() {
                 console.log("turning light on evening at: " + new Date())
                 lightsOn();
             },
             function() {
                 /* This function is executed when the job stops */
-                console.log("lightsOnEvening job stop at: " + new Date())
             },
             true,
             'Europe/Amsterdam'
