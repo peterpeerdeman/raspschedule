@@ -15,6 +15,26 @@ function lightsOn() {
     })
 }
 
+
+function randomLightColor() {
+    // one in seven chance of changing a light
+    if (Math.floor((Math.random() * 7) + 1) != 1) {
+        return false;
+    };
+    request(apiUrl + '/lights/lights', function(error, response, body) {
+        if (error) {
+            return false;
+        }
+        body = JSON.parse(body);
+        var randomId = Math.floor((Math.random() * body.lights.length));
+        // change the randomly selected light to a random color
+        request(apiUrl + '/lights/lights/' + body.lights[randomId].id + '/random', function(error, response, body) {
+            return true;
+        });
+
+    });
+}
+
 function lightsOff() {
     request(apiUrl + '/lights/off', function(error, response, body) {
     })
@@ -53,6 +73,7 @@ var lightsOnEvening = new CronJob({
             function() {
                 console.log("turning light on evening at: " + new Date())
                 lightsOn();
+                randomLightColor();
             },
             function() {
                 /* This function is executed when the job stops */
