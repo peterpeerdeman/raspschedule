@@ -35,6 +35,16 @@ function randomLightColor() {
     });
 }
 
+function dimLights() {
+    request(apiUrl + '/lights/brightness/dec', function(error, response, body) {
+    })
+}
+
+function undimLights() {
+    request(apiUrl + '/lights/brightness/inc', function(error, response, body) {
+    })
+}
+
 function lightsOff() {
     request(apiUrl + '/lights/off', function(error, response, body) {
     });
@@ -47,6 +57,7 @@ var lightsOnWeekdaysMorning = new CronJob({
         console.log("sunrise at: " + times.sunrise + ", triggered at: " + new Date());
         if (times.sunrise > new Date()) {
             lightsOn();
+            undimLights();
         }
     },
     start: true,
@@ -86,8 +97,17 @@ var lightsOnEvening = new CronJob({
     timeZone: 'Europe/Amsterdam'
 });
 
+var dimLightsWeekdaysEvening = new CronJob({
+    cronTime: '00 55 21 * * 0-4',
+    onTick: function() {
+        dimLights();
+    },
+    start: true,
+    timeZone: 'Europe/Amsterdam'
+});
+
 var lightsOffWeekdaysEvening = new CronJob({
-    cronTime: '00 00 22 * * 0-5',
+    cronTime: '00 00 22 * * 0-4',
     onTick: function() {
         lightsOff();
     },
@@ -95,8 +115,17 @@ var lightsOffWeekdaysEvening = new CronJob({
     timeZone: 'Europe/Amsterdam'
 });
 
+var dimLightsWeekendEvening = new CronJob({
+    cronTime: '00 55 00 * * 0,5,6',
+    onTick: function() {
+        dimLights();
+    },
+    start: true,
+    timeZone: 'Europe/Amsterdam'
+});
+
 var lightsOffWeekendEvening = new CronJob({
-    cronTime: '00 00 01 * * 0,6',
+    cronTime: '00 00 01 * * 0,5,6',
     onTick: function() {
         lightsOff();
     },
