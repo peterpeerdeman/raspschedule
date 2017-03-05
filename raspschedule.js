@@ -8,11 +8,11 @@ var recordFairsTokenUrl = '';
 var geolocation = {
     lat: 52.4996287,
     lng: 4.9375694
-}
+};
 
 function lightsOn() {
     request(apiUrl + '/lights/on', function(error, response, body) {
-    })
+    });
 }
 
 
@@ -37,13 +37,13 @@ function randomLightColor() {
 
 function lightsOff() {
     request(apiUrl + '/lights/off', function(error, response, body) {
-    })
+    });
 }
 
 var lightsOnWeekdaysMorning = new CronJob({
     cronTime: '00 00 07 * * 1-5',
     onTick: function() {
-        var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng)
+        var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
         console.log("sunrise at: " + times.sunrise + ", triggered at: " + new Date());
         if (times.sunrise > new Date()) {
             lightsOn();
@@ -65,13 +65,13 @@ var lightsOffWeekdaysMorning = new CronJob({
 var lightsOnEvening = new CronJob({
     cronTime: '00 00 04 * * *',
     onTick: function() {
-        var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng)
-        console.log("sunset: " + times.sunset)
-        console.log("scheduling for: " + moment(times.sunset).subtract(30, 'minutes').toDate())
+        var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
+        console.log("sunset: " + times.sunset);
+        console.log("scheduling for: " + moment(times.sunset).subtract(30, 'minutes').toDate());
         new CronJob(
             moment(times.sunset).subtract(30, 'minutes').toDate(), 
             function() {
-                console.log("turning light on evening at: " + new Date())
+                console.log("turning light on evening at: " + new Date());
                 lightsOn();
                 randomLightColor();
             },
