@@ -1,52 +1,94 @@
+require('dotenv').config();
+
 var CronJob = require('cron').CronJob;
 var request = require('request');
 var suncalc = require('suncalc');
 var moment = require('moment');
 
-var apiUrl = 'http://localhost:3000/api';
-var recordFairsTokenUrl = '';
+var RASPAPI_URL = process.env.RASPAPI_URL;
+var RASPAPI_AUTH = process.env.RASPAPI_AUTH;
+var recordFairsTokenUrl = process.env.RECORDFAIRS_TOKEN_URL;
 var geolocation = {
-    lat: 52.4996287,
-    lng: 4.9375694
+    lat: parseFloat(process.env.GEOLOCATION_LAT),
+    lng: parseFloat(process.env.GEOLOCATION_LNG)
 };
 
 function lightsOn() {
-    request(apiUrl + '/lights/on', function(error, response, body) {
+    request({
+        url: RASPAPI_URL + '/lights/on',
+        headers: {
+            'Authorization': RASPAPI_AUTH
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.error(error);
+        } 
+        console.log('turned lights on');
     });
 }
-
 
 function randomLightColor() {
     // one in seven chance of changing a light
     if (Math.floor((Math.random() * 7) + 1) != 1) {
         return false;
     };
-    request(apiUrl + '/lights/lights', function(error, response, body) {
+    request({
+        url: RASPAPI_URL + '/lights/lights',
+        headers: {
+            'Authorization': RASPAPI_AUTH
+        }
+    }, function(error, response, body) {
         if (error) {
             return false;
         }
         body = JSON.parse(body);
         var randomId = Math.floor((Math.random() * body.lights.length));
         // change the randomly selected light to a random color
-        request(apiUrl + '/lights/lights/' + body.lights[randomId].id + '/random', function(error, response, body) {
+        request(RASPAPI_URL + '/lights/lights/' + body.lights[randomId].id + '/random', function(error, response, body) {
             return true;
         });
-
     });
 }
 
 function dimLights() {
-    request(apiUrl + '/lights/brightness/dec', function(error, response, body) {
-    })
+    request({
+        url: RASPAPI_URL + '/lights/brightness/dec',
+        headers: {
+            'Authorization': RASPAPI_AUTH
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.error(error);
+        } 
+        console.log('dimmed lights');
+    });
 }
 
 function undimLights() {
-    request(apiUrl + '/lights/brightness/inc', function(error, response, body) {
-    })
+    request({
+        url: RASPAPI_URL + '/lights/brightness/inc',
+        headers: {
+            'Authorization': RASPAPI_AUTH
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.error(error);
+        } 
+        console.log('undimmed lights');
+    });
 }
 
 function lightsOff() {
-    request(apiUrl + '/lights/off', function(error, response, body) {
+    request({
+        url: RASPAPI_URL + '/lights/off',
+        headers: {
+            'Authorization': RASPAPI_AUTH
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.error(error);
+        } 
+        console.log('lights off');
     });
 }
 
@@ -63,6 +105,7 @@ var lightsOnWeekdaysMorning = new CronJob({
     start: true,
     timeZone: 'Europe/Amsterdam'
 });
+
 
 var lightsOffWeekdaysMorning = new CronJob({
     cronTime: '00 20 08 * * 1-5',
@@ -153,3 +196,5 @@ var wakeRecordFairs = new CronJob({
     start: true,
     timeZone: 'Europe/Amsterdam'
 });
+
+console.log('scheduled cronjobs', new Date());
