@@ -93,7 +93,7 @@ function lightsOff() {
 }
 
 var lightsOnWeekdaysMorning = new CronJob({
-    cronTime: '00 00 07 * * 1-5',
+    cronTime: '0 0 7 * * 1-5',
     onTick: function() {
         var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
         console.log("sunrise at: " + times.sunrise + ", triggered at: " + new Date());
@@ -108,7 +108,7 @@ var lightsOnWeekdaysMorning = new CronJob({
 
 
 var lightsOffWeekdaysMorning = new CronJob({
-    cronTime: '00 20 08 * * 1-5',
+    cronTime: '0 20 8 * * 1-5',
     onTick: function() {
         lightsOff();
     },
@@ -117,7 +117,7 @@ var lightsOffWeekdaysMorning = new CronJob({
 });
 
 var lightsOnEvening = new CronJob({
-    cronTime: '00 00 04 * * *',
+    cronTime: '0 0 4 * * *',
     onTick: function() {
         var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
         console.log("sunset: " + times.sunset);
@@ -141,7 +141,7 @@ var lightsOnEvening = new CronJob({
 });
 
 var dimLightsWeekdaysEvening = new CronJob({
-    cronTime: '00 55 21 * * 0-4',
+    cronTime: '0 55 21 * * 0-4',
     onTick: function() {
         dimLights();
     },
@@ -150,7 +150,7 @@ var dimLightsWeekdaysEvening = new CronJob({
 });
 
 var lightsOffWeekdaysEvening = new CronJob({
-    cronTime: '00 00 22 * * 0-4',
+    cronTime: '0 0 22 * * 0-4',
     onTick: function() {
         lightsOff();
     },
@@ -159,7 +159,7 @@ var lightsOffWeekdaysEvening = new CronJob({
 });
 
 var dimLightsWeekendEvening = new CronJob({
-    cronTime: '00 55 00 * * 0,5,6',
+    cronTime: '0 55 0 * * 0,5-6',
     onTick: function() {
         dimLights();
     },
@@ -168,7 +168,7 @@ var dimLightsWeekendEvening = new CronJob({
 });
 
 var lightsOffWeekendEvening = new CronJob({
-    cronTime: '00 00 01 * * 0,5,6',
+    cronTime: '0 0 01 * * 0,5-6',
     onTick: function() {
         lightsOff();
     },
@@ -177,8 +177,9 @@ var lightsOffWeekendEvening = new CronJob({
 });
 
 var updateRecordFairs = new CronJob({
-    cronTime: '00 00 00 * * *',
+    cronTime: '0 0 0 * * *',
     onTick: function() {
+        console.log('updating recordfairs, ', new Date());
         request.post(recordFairsTokenUrl, function(error, response, body) {
             console.log('updated recordfairs, ', new Date());
         });
@@ -190,7 +191,9 @@ var updateRecordFairs = new CronJob({
 var wakeRecordFairs = new CronJob({
     cronTime: '0 0 8-24 * * *',
     onTick: function() {
+        console.log('waking recordfairs, ', new Date());
         request.get('http://recordfairs.nl/favicon-16x16.png', function(error, response, body) {
+            console.log('woke recordfairs, ', new Date());
         });
     },
     start: true,
