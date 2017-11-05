@@ -92,6 +92,17 @@ function lightsOff() {
     });
 }
 
+function scheduleEveningLights() {
+    var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
+    console.log("sunset: " + times.sunset);
+    console.log("scheduling for: " + moment(times.sunset).subtract(30, 'minutes').toDate());
+    const sunsetJob = schedule.scheduleJob(moment(times.sunset).subtract(30, 'minutes').toDate(), function() {
+        console.log("turning light on evening at: " + new Date());
+        lightsOn();
+        randomLightColor();
+    });
+}
+
 var lightsOnWeekdaysMorning = schedule.scheduleJob('0 0 7 * * 1-5', function() {
     var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
     console.log("sunrise at: " + times.sunrise + ", triggered at: " + new Date());
@@ -107,14 +118,7 @@ var lightsOffWeekdaysMorning = schedule.scheduleJob('0 20 8 * * 1-5', function()
 });
 
 var lightsOnEvening = schedule.scheduleJob('0 0 4 * * *', function() {
-    var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
-    console.log("sunset: " + times.sunset);
-    console.log("scheduling for: " + moment(times.sunset).subtract(30, 'minutes').toDate());
-    const sunsetJob = schedule.scheduleJob(moment(times.sunset).subtract(30, 'minutes').toDate(), function() {
-        console.log("turning light on evening at: " + new Date());
-        lightsOn();
-        randomLightColor();
-    });
+    scheduleEveningLights();
 });
 
 var dimLightsWeekdaysEvening = schedule.scheduleJob('0 55 21 * * 0-4', function() {
@@ -147,4 +151,5 @@ var wakeRecordFairs = schedule.scheduleJob('0 0 8-24 * * *', function() {
     });
 });
 
+scheduleEveningLights();
 console.log('scheduled cronjobs', new Date());
