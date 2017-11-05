@@ -106,8 +106,7 @@ var lightsOffWeekdaysMorning = schedule.scheduleJob('0 20 8 * * 1-5', function()
     lightsOff();
 });
 
-//var lightsOnEvening = schedule.scheduleJob('0 0 4 * * *', function() {
-var lightsOnEvening = schedule.scheduleJob('0 21 11 * * *', function() {
+var lightsOnEvening = schedule.scheduleJob('0 0 4 * * *', function() {
     var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
     console.log("sunset: " + times.sunset);
     console.log("scheduling for: " + moment(times.sunset).subtract(30, 'minutes').toDate());
