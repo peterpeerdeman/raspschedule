@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-var CronJob = require('cron').CronJob;
+var schedule = require('node-schedule');
 var request = require('request');
 var suncalc = require('suncalc');
 var moment = require('moment');
@@ -92,58 +92,60 @@ function lightsOff() {
     });
 }
 
-var lightsOnWeekdaysMorning = new CronJob('0 0 7 * * 1-5', function() {
+var lightsOnWeekdaysMorning = schedule.scheduleJob('0 0 7 * * 1-5', function() {
     var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
     console.log("sunrise at: " + times.sunrise + ", triggered at: " + new Date());
+    console.log("sunrise>now: ",  times.sunrise > new Date());
     if (times.sunrise > new Date()) {
         lightsOn();
         undimLights();
     }
-}, null, true);
+});
 
-var lightsOffWeekdaysMorning = new CronJob('0 20 8 * * 1-5', function() {
+var lightsOffWeekdaysMorning = schedule.scheduleJob('0 20 8 * * 1-5', function() {
     lightsOff();
-}, null, true);
+});
 
-var lightsOnEvening = new CronJob('0 0 4 * * *', function() {
+//var lightsOnEvening = schedule.scheduleJob('0 0 4 * * *', function() {
+var lightsOnEvening = schedule.scheduleJob('0 21 11 * * *', function() {
     var times = suncalc.getTimes(new Date(), geolocation.lat, geolocation.lng);
     console.log("sunset: " + times.sunset);
     console.log("scheduling for: " + moment(times.sunset).subtract(30, 'minutes').toDate());
-    new CronJob(moment(times.sunset).subtract(30, 'minutes').toDate(), function() {
+    const sunsetJob = schedule.scheduleJob(moment(times.sunset).subtract(30, 'minutes').toDate(), function() {
         console.log("turning light on evening at: " + new Date());
         lightsOn();
         randomLightColor();
-    },null, true);
-}, null, true);
+    });
+});
 
-var dimLightsWeekdaysEvening = new CronJob('0 55 21 * * 0-4', function() {
+var dimLightsWeekdaysEvening = schedule.scheduleJob('0 55 21 * * 0-4', function() {
     dimLights();
-}, null, true);
+});
 
-var lightsOffWeekdaysEvening = new CronJob('0 0 22 * * 0-4', function() {
+var lightsOffWeekdaysEvening = schedule.scheduleJob('0 0 22 * * 0-4', function() {
     lightsOff();
-},null,true);
+});
 
-var dimLightsWeekendEvening = new CronJob('0 55 0 * * 0,5-6', function() {
+var dimLightsWeekendEvening = schedule.scheduleJob('0 55 0 * * 0,5-6', function() {
     dimLights();
-},null,true);
+});
 
-var lightsOffWeekendEvening = new CronJob('0 0 1 * * 0,5-6', function() {
+var lightsOffWeekendEvening = schedule.scheduleJob('0 0 1 * * 0,5-6', function() {
     lightsOff();
-},null,true);
+});
 
-var updateRecordFairs = new CronJob('0 0 0 * * *', function() {
+var updateRecordFairs = schedule.scheduleJob('0 0 0 * * *', function() {
     console.log('updating recordfairs, ', new Date());
     request.post(recordFairsTokenUrl, function(error, response, body) {
         console.log('updated recordfairs, ', new Date());
     });
-},null,true);
+});
 
-var wakeRecordFairs = new CronJob('0 0 8-24 * * *', function() {
+var wakeRecordFairs = schedule.scheduleJob('0 0 8-24 * * *', function() {
     console.log('waking recordfairs, ', new Date());
     request.get('http://recordfairs.nl/favicon-16x16.png', function(error, response, body) {
         console.log('woke recordfairs, ', new Date());
     });
-},null,true);
+});
 
 console.log('scheduled cronjobs', new Date());
